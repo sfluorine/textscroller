@@ -12,10 +12,10 @@ This is a simple text scroller program written in C. Simulating a scrolling effe
 1. Clone the repository or download the source code.
 2. Open a terminal and navigate to the directory containing the source code.
 3. Compile the program using the following command:
-    ```sh
-    tup init
-    tup
-    ```
+```sh
+tup init
+tup
+```
 
 ## Usage
 
