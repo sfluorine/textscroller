@@ -27,6 +27,8 @@ static void print_text(const char* text, int delay)
 
     while (1) {
         printf("%s\n", buffer);
+        fflush(stdout);
+
         shift_text(buffer, length + 1);
 
         ts.tv_sec = delay / 1000;
