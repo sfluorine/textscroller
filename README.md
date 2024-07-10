@@ -21,16 +21,8 @@ tup
 
 Run the compiled program from the terminal:
 ```sh
-./bin/textscroller
+./bin/textscroller -d 700 "hello, this is a quite long text."
 ```
-
-You can customize the text and the number of shifts directly in the source code.
-
-## Example
-
-    ```sh
-    ./bin/textscroller -d 700 "hello, this is a quite long text."
-    ```
 
 ## License
 
