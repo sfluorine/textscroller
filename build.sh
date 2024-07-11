@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
 
-set -xe
-
-CC=gcc
-$CC src/textscroller.c -O2 -o textscroller
+CC=${CC:-gcc}
+$CC src/textscroller.c -Wall -Wextra -O2 -o textscroller
