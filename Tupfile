@@ -1,5 +1,0 @@
-import CC=gcc
-CFLAGS += -Wall -Wextra -c -O2
-
-: foreach src/*.c |> $(CC) $(CFLAGS) %f -o %o |> build/%B.o
-: build/*.o |> $(CC) %f -o %o |> bin/textscroller

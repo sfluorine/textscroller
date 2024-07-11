@@ -5,23 +5,21 @@ This is a simple text scroller program written in C. Simulating a scrolling effe
 ## Requirements
 
 - A C compiler (e.g., `gcc`)
-- [tup](https://gittup.org/tup) build system
 
-## Installation
+## Building
 
 1. Clone the repository or download the source code.
 2. Open a terminal and navigate to the directory containing the source code.
 3. Compile the program using the following command:
 ```sh
-tup init
-tup
+./build.sh
 ```
 
 ## Usage
 
 Run the compiled program from the terminal:
 ```sh
-./bin/textscroller -d 700 "hello, this is a quite long text."
+./textscroller -d 700 "hello, this is a quite long text."
 ```
 
 ## License
