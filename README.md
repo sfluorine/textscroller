@@ -2,6 +2,10 @@
 
 This is a simple text scroller program written in C. Simulating a scrolling effect.
 
+## Example
+
+Gif example is coming soon!
+
 ## Requirements
 
 - A C compiler (e.g., `gcc`)
@@ -19,7 +23,11 @@ This is a simple text scroller program written in C. Simulating a scrolling effe
 
 Run the compiled program from the terminal:
 ```sh
-./textscroller -d 700 "hello, this is a quite long text."
+./textscroller "hello! こんにちは! так круто!"
+```
+or
+```sh
+./textscroller -d 400 "hello world!" | figlet
 ```
 
 ## License
