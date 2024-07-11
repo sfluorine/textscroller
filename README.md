@@ -31,7 +31,7 @@ or
 ```
 orr
 ```sh
-./textscroller -d 400 "hello world!" | figlet
+./textscroller -d 400 "$(figlet "hello world!")
 ```
 
 ## License
