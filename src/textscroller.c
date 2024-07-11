@@ -34,6 +34,7 @@ static void print_usage_and_exit(const char* program_name)
     fprintf(stderr, "           -d <amount>     Delay the output in millisecond (default 600ms).\n");
     fprintf(stderr, "           -f <file>       Read text from file\n");
     fprintf(stderr, "           -w <file>       Read text from file and watch for changes\n");
+
     exit(1);
 }
 
@@ -100,9 +101,11 @@ static Input parse_command_line(const char* program_name, int argc, char** argv)
     input.line_count = 0;
     input.filepath = NULL;
 
-    const char* text = NULL;
+    char* text = NULL;
+    int text_len = 0;
+    int text_cap = 1;
 
-    while (input.kind == INPUT_ARG && argc > 0) {
+    while (argc > 0) {
         const char* flag = shift_arguments(&argc, &argv);
 
         if (strcmp(flag, "-h") == 0) {
@@ -135,7 +138,26 @@ static Input parse_command_line(const char* program_name, int argc, char** argv)
             input.kind = INPUT_FILE_WATCH;
             input.filepath = filepath;
         } else {
-            text = flag;
+            int len = strlen(flag);
+
+            if (!text) {
+                text_cap += len;
+
+                text = malloc(sizeof(char) * text_cap);
+                strncpy(text, flag, len);
+                text[len] = '\0';
+
+                text_len += len;
+            } else {
+                text_cap += len + 1;
+
+                text = realloc(text, sizeof(char) * text_cap);
+                text[text_len++] = ' ';
+
+                strncpy(text + text_len, flag, len);
+                text_len += len;
+                text[text_len] = '\0';
+            }
         }
     }
 
@@ -147,6 +169,7 @@ static Input parse_command_line(const char* program_name, int argc, char** argv)
     assert(input.kind == INPUT_ARG && "currently only accepting input from the command line argument.");
 
     input.lines = get_lines_from_text(text, &input.line_count);
+    free(text);
 
     return input;
 }

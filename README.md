@@ -27,6 +27,10 @@ Run the compiled program from the terminal:
 ```
 or
 ```sh
+./textscroller hello! こんにちは! так круто!
+```
+orr
+```sh
 ./textscroller -d 400 "hello world!" | figlet
 ```
 
