@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,8 +17,14 @@ typedef enum {
     INPUT_FILE_WATCH,
 } InputKind;
 
+typedef enum {
+    PRINT_NEWLINE,
+    PRINT_INLINE,
+} PrintMethod;
+
 typedef struct {
     InputKind kind;
+    PrintMethod pmethod;
 
     int delay;
 
@@ -31,7 +38,8 @@ static void print_usage_and_exit(const char* program_name)
 {
     fprintf(stderr, "usage: %s [<options>] [<text to show>]\n", program_name);
     fprintf(stderr, "options:   -h              Display usage\n");
-    fprintf(stderr, "           -d <amount>     Delay the output in millisecond (default 600ms).\n");
+    fprintf(stderr, "           -d <amount>     Delay the output in millisecond (default 600)\n");
+    fprintf(stderr, "           -n <true/false> Print newline (default true)\n");
     fprintf(stderr, "           -f <file>       Read text from file\n");
     fprintf(stderr, "           -w <file>       Read text from file and watch for changes\n");
 
@@ -96,6 +104,7 @@ static Input parse_command_line(const char* program_name, int argc, char** argv)
 {
     Input input;
     input.kind = INPUT_ARG;
+    input.pmethod = PRINT_NEWLINE;
     input.delay = DEFAULT_DELAY_AMOUNT;
     input.lines = NULL;
     input.line_count = 0;
@@ -111,18 +120,47 @@ static Input parse_command_line(const char* program_name, int argc, char** argv)
         if (strcmp(flag, "-h") == 0) {
             print_usage_and_exit(program_name);
         } else if (strcmp(flag, "-d") == 0) {
+            // delay in millisecond.
             const char* amount = shift_arguments(&argc, &argv);
-
-            if (amount == NULL) {
+            if (!amount) {
+                fprintf(stderr, "error: please specity an argument for -d\n");
                 print_usage_and_exit(program_name);
             }
 
-            // delay in millisecond.
-            input.delay = atoi(amount);
+            errno = 0;
+            char* endptr = NULL;
+
+            input.delay = strtol(amount, &endptr, 10);
+
+            if (amount == endptr) {
+                fprintf(stderr, "error: please specity a valid argument for -d\n");
+                print_usage_and_exit(program_name);
+            }
+
+            if (errno == EINVAL || errno == ERANGE) {
+                fprintf(stderr, "error: please specity a valid argument for -d\n");
+                print_usage_and_exit(program_name);
+            }
+        } else if (strcmp(flag, "-n") == 0) {
+            const char* value = shift_arguments(&argc, &argv);
+            if (!value) {
+                fprintf(stderr, "error: please specify an argument for -n\n");
+                print_usage_and_exit(program_name);
+            }
+
+            if (strcmp(value, "true") != 0 && strcmp(value, "false") != 0) {
+                fprintf(stderr, "error: please specify a valid argument for -n\n");
+                print_usage_and_exit(program_name);
+            }
+
+            if (strcmp(value, "false") == 0) {
+                input.pmethod = PRINT_INLINE;
+            }
         } else if (strcmp(flag, "-f") == 0) {
             const char* filepath = shift_arguments(&argc, &argv);
 
             if (filepath == NULL) {
+                fprintf(stderr, "error: please specify an argument for -f\n");
                 print_usage_and_exit(program_name);
             }
 
@@ -132,6 +170,7 @@ static Input parse_command_line(const char* program_name, int argc, char** argv)
             const char* filepath = shift_arguments(&argc, &argv);
 
             if (filepath == NULL) {
+                fprintf(stderr, "error: please specify an argument for -w\n");
                 print_usage_and_exit(program_name);
             }
 
@@ -201,8 +240,13 @@ static void print_text(Input* input)
 
     while (1) {
         for (int i = 0; i < input->line_count; i++) {
-            wprintf(L"%ls\n", buffer[i]);
-            fflush(stdout);
+            if (input->pmethod == PRINT_NEWLINE) {
+                wprintf(L"%ls\n", buffer[i]);
+                fflush(stdout);
+            } else {
+                wprintf(L"%ls\r", buffer[i]);
+                fflush(stdout);
+            }
         }
 
         for (int i = 0; i < input->line_count; i++) {
